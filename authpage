@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Facebook Login</title>
+  <meta charset="UTF-8">
+  <script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js"></script>
+</head>
+<body>
+  <div id="fb-root"></div>
+  <script>
+    function statusChangeCallback(response) {
+      if (response.status === 'connected') {
+        getLongLivedToken(response.authResponse.accessToken);
+      }
+    }
+
+    function checkLoginState() {
+      FB.getLoginStatus(function(response) {
+        statusChangeCallback(response);
+      });
+    }
+
+    window.fbAsyncInit = function() {
+      FB.init({
+        appId: '1641278509706174', // Замените на свой App ID
+        cookie: true,
+        xfbml: true,
+        version: 'v12.0'
+      });
+
+      FB.getLoginStatus(function(response) {
+        statusChangeCallback(response);
+      });
+    };
+
+    function getLongLivedToken(shortLivedToken) {
+      var xhttp = new XMLHttpRequest();
+      xhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+          var longLivedToken = JSON.parse(this.responseText).access_token;
+          sendDataToServer(longLivedToken);
+        }
+      };
+      xhttp.open("GET", "https://graph.facebook.com/v12.0/oauth/access_token?grant_type=fb_exchange_token&client_id=1641278509706174&client_secret=9e111c4d50cdf889eb53dac158057c1c&fb_exchange_token=" + shortLivedToken, true);
+      xhttp.send();
+    }
+
+    function sendDataToServer(longLivedToken) {
+      // Здесь отправьте longLivedToken на ваш сервер для дальнейшей обработки и хранения
+    }
+  </script>
+
+  <!-- The JS SDK Login Button -->
+  <fb:login-button scope="ads_read" onlogin="checkLoginState();"></fb:login-button>
+
+  <div id="status"></div>
+</body>
+</html>
